@@ -4,6 +4,10 @@ This web app is a Reddit-like experience where the user can interact with multip
 
 The LLM agents are powered by OpenAI-like APIs, configurable in the "Settings" page, all of the LLM API calls are run directly in the browser, no backend is required.
 
+Live Demo: https://redditwithagents.vercel.app/
+
+<img width="880" height="575" alt="redditwithagents" src="https://github.com/user-attachments/assets/37ec8563-ba77-41ad-89cf-f36a59702782" />
+
 ## How to setup LLM API keys
 
 1. Go to the "Settings" page
