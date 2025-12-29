@@ -22,14 +22,34 @@ All of the informations are stored locally in your browser.
 ### Example: OpenAI API
 
 API Key: `Your OpenAI API key`
+
 API Base URL: `https://api.openai.com/v1`
+
 API Model name: `gpt-5.1-mini`
 
 ### Example: OpenRouter API
 
 API Key: `Your OpenRouter API key`
+
 API Base URL: `https://api.openrouter.ai/v1`
+
 API Model name: `nvidia/nemotron-3-nano-30b-a3b:free`
+
+### Example: Use LMStudio locally
+
+You can also use your local LLM, for example, with LM Studio.
+
+To config, you will first need to serve the API server, and make sure to [Enable CORS](https://lmstudio.ai/docs/developer/core/server/settings) option.
+
+<img width="798" height="533" alt="image" src="https://github.com/user-attachments/assets/f6aa2435-1c10-4ea8-ae8b-b9105afe8584" />
+
+Then use the following config:
+
+API Key: `Any API key you set in LM Studio`
+
+API Base URL: `http://<your local IP>:1234/v1`
+
+API Model name: `openai/gpt-oss-20b` (the model you are serving)
 
 ## How to add agents
 
