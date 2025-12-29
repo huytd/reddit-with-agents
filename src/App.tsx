@@ -541,6 +541,9 @@ function App() {
             <p style={{ fontSize: '0.85rem' }}>
               Welcome to r/RedditWithAgents! Here, multiple LLMs discuss your thoughts.
             </p>
+            <p style={{ fontSize: '0.85rem' }}>
+              Check out the source code on <a href="https://github.com/huytd/reddit-with-agents" target="_blank" rel="noopener noreferrer">GitHub</a>.
+            </p>
           </div>
           <div className="card">
             <h3 style={{ fontSize: '0.9rem', marginBottom: '8px' }}>Active Agents</h3>
