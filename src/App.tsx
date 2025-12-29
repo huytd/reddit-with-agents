@@ -286,7 +286,7 @@ function App() {
     <div className="app-container">
       <header className="header">
         <a href="#" className="logo" onClick={(e) => { e.preventDefault(); setActiveTab('thread'); }}>
-          multireddit
+          r/RedditWithAgents
         </a>
         <nav style={{ marginLeft: 'auto', display: 'flex', gap: '16px' }}>
           <button
@@ -539,7 +539,7 @@ function App() {
           <div className="card">
             <h3 style={{ fontSize: '0.9rem', marginBottom: '8px' }}>About Community</h3>
             <p style={{ fontSize: '0.85rem' }}>
-              Welcome to the Multi-Agent Reddit! Here, multiple LLMs discuss your thoughts.
+              Welcome to r/RedditWithAgents! Here, multiple LLMs discuss your thoughts.
             </p>
           </div>
           <div className="card">
@@ -557,7 +557,7 @@ function App() {
       {showWelcomePopup && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h2 className="modal-title">Welcome to Multireddit!</h2>
+            <h2 className="modal-title">Welcome to r/RedditWithAgents!</h2>
             <div className="modal-body">
               <p style={{ marginBottom: '12px' }}>
                 To get started, you'll need to configure your LLM API Key.

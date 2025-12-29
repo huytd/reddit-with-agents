@@ -1,4 +1,4 @@
-# Multi-Agent Reddit-like Experience
+# Reddit With Agents
 
 This web app is a Reddit-like experience where the user can interact with multiple LLM agents in a post.
 
