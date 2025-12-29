@@ -1,0 +1,329 @@
+:root {
+  --reddit-orange: #ff4500;
+  --reddit-blue: #0079d3;
+  --bg-color: #dae0e6;
+  --card-bg: #ffffff;
+  --text-primary: #1c1c1c;
+  --text-secondary: #7c7c7c;
+  --border-color: #ccc;
+  --hover-bg: #f6f7f8;
+  --header-bg: #ffffff;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #030303;
+    --card-bg: #1a1a1b;
+    --text-primary: #d7dadc;
+    --text-secondary: #818384;
+    --border-color: #343536;
+    --hover-bg: #272729;
+    --header-bg: #1a1a1b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  height: 48px;
+  background-color: var(--header-bg);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-color);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--reddit-orange);
+  text-decoration: none;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 312px;
+  gap: 24px;
+  max-width: 1200px;
+  min-width: 1200px;
+  margin: 68px auto 20px;
+  /* Adjusted for fixed header (48px + 20px) */
+  padding: 0 16px;
+}
+
+@media (max-width: 800px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    min-width: unset;
+    margin-top: 60px;
+  }
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.card:hover {
+  border-color: #898989;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--hover-bg);
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--reddit-blue);
+  background: var(--card-bg);
+}
+
+.btn-primary {
+  background-color: var(--reddit-blue);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.post-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.post-meta {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.comment {
+  border-left: 2px solid var(--border-color);
+  padding-left: 16px;
+  margin-top: 12px;
+  position: relative;
+}
+
+.comment:hover {
+  border-left-color: var(--reddit-blue);
+}
+
+.comment-author {
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.comment-content {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.comment-content p {
+  margin-bottom: 12px;
+}
+
+.comment-content p:last-child {
+  margin-bottom: 0;
+}
+
+.comment-content ul,
+.comment-content ol {
+  margin-bottom: 12px;
+  padding-left: 20px;
+}
+
+.comment-content li {
+  margin-bottom: 4px;
+}
+
+.comment-content pre {
+  background: var(--hover-bg);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 12px 0;
+  border: 1px solid var(--border-color);
+}
+
+.comment-content code {
+  background: var(--hover-bg);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 85%;
+}
+
+/* Attachments */
+.attachment-block {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 12px 0;
+  /* Added margin for spacing */
+}
+
+.attachment-block details summary {
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.03);
+  transition: background-color 0.2s;
+  cursor: pointer;
+  /* Added cursor for usability */
+}
+
+.attachment-block details summary:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.attachment-block pre {
+  margin: 0;
+  padding: 12px;
+  background-color: #f6f8fa;
+  font-family: 'ui-monospace', 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  border-top: 1px solid var(--border-color);
+  overflow-x: auto;
+  /* Ensure pre content is scrollable */
+}
+
+[prefers-color-scheme='dark'] .attachment-block pre {
+  background-color: #0d1117;
+}
+
+.comment-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 0.85rem;
+}
+
+.comment-content th,
+.comment-content td {
+  border: 1px solid var(--border-color);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.comment-content th {
+  background-color: var(--hover-bg);
+  font-weight: bold;
+}
+
+.typing-indicator {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 8px;
+}
+
+/* Modal / Popup */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  max-width: 500px;
+  width: 100%;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.modal-body {
+  margin-bottom: 24px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.highlight-box {
+  background-color: rgba(0, 121, 211, 0.1);
+  border: 1px solid var(--reddit-blue);
+  padding: 12px;
+  border-radius: 4px;
+  margin: 16px 0;
+}
