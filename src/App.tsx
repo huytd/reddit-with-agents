@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { APIConfig, Message, Post, Agent } from './types';
 import { DEFAULT_AGENTS, AgentManager, PERSONALITY_PROMPTS } from './logic/AgentManager';
 import { LLMService } from './services/LLMService';
@@ -25,7 +25,41 @@ function Comment({ message, allMessages, onReply, isOrchestrating, agents }: Com
         <>
           <div className="comment-author" style={{ color: agent?.color }}>{message.author}</div>
           <div className="comment-content">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                text: ({ node, ...props }) => {
+                  const text = props.children?.toString() || '';
+                  const mentionRegex = /u\/([A-Za-z0-9_]+)/g;
+                  const parts = text.split(mentionRegex);
+
+                  return (
+                    <>
+                      {parts.map((part, index) => {
+                        if (index % 2 === 1) {
+                          return (
+                            <span
+                              key={index}
+                              style={{
+                                backgroundColor: 'var(--reddit-blue)',
+                                color: 'white',
+                                padding: '2px 4px',
+                                borderRadius: '3px',
+                                fontSize: '0.85em',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              u/{part}
+                            </span>
+                          );
+                        }
+                        return part;
+                      })}
+                    </>
+                  );
+                },
+              }}
+            >
               {message.content}
             </ReactMarkdown>
             {message.attachment && (
@@ -64,6 +98,208 @@ function Comment({ message, allMessages, onReply, isOrchestrating, agents }: Com
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+interface MentionAutocompleteProps {
+  agents: Agent[];
+  query: string;
+  position: { top: number; left: number };
+  onSelect: (agentName: string) => void;
+  onClose: () => void;
+}
+
+function MentionAutocomplete({ agents, query, position, onSelect, onClose }: MentionAutocompleteProps) {
+  const filteredAgents = agents.filter(agent =>
+    agent.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const handleKeyDown = (e: React.KeyboardEvent, agentName: string) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      onSelect(agentName);
+    } else if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
+  if (filteredAgents.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      className="mention-autocomplete"
+      style={{
+        position: 'absolute',
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+        backgroundColor: 'var(--card-bg)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '4px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+        maxHeight: '200px',
+        overflowY: 'auto',
+        zIndex: 1000,
+        minWidth: '200px',
+      }}
+    >
+      {filteredAgents.map((agent, index) => (
+        <div
+          key={agent.id}
+          className="mention-autocomplete-item"
+          onClick={() => onSelect(agent.name)}
+          onKeyDown={(e) => handleKeyDown(e, agent.name)}
+          style={{
+            padding: '8px 12px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '0.9rem',
+            borderBottom: index < filteredAgents.length - 1 ? '1px solid var(--border-color)' : 'none',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'var(--hover-bg)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
+        >
+          <div
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: agent.color,
+            }}
+          />
+          <span>u/{agent.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface InputWithMentionsProps {
+  value: string;
+  onChange: (value: string) => void;
+  onPaste?: (e: React.ClipboardEvent) => void;
+  placeholder: string;
+  agents: Agent[];
+  disabled?: boolean;
+}
+
+function InputWithMentions({ value, onChange, onPaste, placeholder, agents, disabled }: InputWithMentionsProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0 });
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    onChange(newValue);
+
+    const cursorPos = e.target.selectionStart;
+    const textBeforeCursor = newValue.substring(0, cursorPos);
+    const mentionMatch = textBeforeCursor.match(/u\/(\w*)$/);
+
+    if (mentionMatch) {
+      const query = mentionMatch[1];
+      const startPos = textBeforeCursor.lastIndexOf('u/');
+      const mentionStart = startPos + 2;
+
+      const element = textareaRef.current;
+      if (element) {
+        const textBeforeMention = newValue.substring(0, mentionStart);
+        const lines = textBeforeMention.split('\n');
+        const currentLine = lines[lines.length - 1];
+        const charWidth = 8;
+        const lineHeight = 20;
+        const padding = 16;
+
+        setMentionPosition({
+          top: lines.length * lineHeight + 40,
+          left: currentLine.length * charWidth + padding,
+        });
+      }
+
+      setMentionQuery(query);
+      setShowAutocomplete(true);
+    } else {
+      setShowAutocomplete(false);
+      setMentionQuery('');
+    }
+  };
+
+  const handleSelectMention = (agentName: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const cursorPos = textarea.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPos);
+    const mentionMatch = textBeforeCursor.match(/u\/(\w*)$/);
+
+    if (mentionMatch) {
+      const startPos = textBeforeCursor.lastIndexOf('u/');
+      const beforeMention = value.substring(0, startPos);
+      const afterCursor = value.substring(cursorPos);
+      const newValue = `${beforeMention}u/${agentName}${afterCursor}`;
+
+      onChange(newValue);
+
+      setTimeout(() => {
+        if (textarea) {
+          const newCursorPos = startPos + 2 + agentName.length;
+          textarea.setSelectionRange(newCursorPos, newCursorPos);
+          textarea.focus();
+        }
+      }, 0);
+    }
+
+    setShowAutocomplete(false);
+    setMentionQuery('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (showAutocomplete && (e.key === 'Enter' || e.key === 'Tab')) {
+      e.preventDefault();
+      if (mentionQuery) {
+        const firstMatch = agents.find(agent =>
+          agent.name.toLowerCase().includes(mentionQuery.toLowerCase())
+        );
+        if (firstMatch) {
+          handleSelectMention(firstMatch.name);
+        }
+      }
+    } else if (e.key === 'Escape' && showAutocomplete) {
+      setShowAutocomplete(false);
+    }
+  };
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <textarea
+        ref={textareaRef}
+        className="input-field"
+        style={{ minHeight: '120px', resize: 'vertical' }}
+        placeholder={placeholder}
+        value={value}
+        onChange={handleChange}
+        onPaste={onPaste}
+        onKeyDown={handleKeyDown}
+        disabled={disabled}
+      />
+      {showAutocomplete && (
+        <MentionAutocomplete
+          agents={agents}
+          query={mentionQuery}
+          position={mentionPosition}
+          onSelect={handleSelectMention}
+          onClose={() => setShowAutocomplete(false)}
+        />
+      )}
     </div>
   );
 }
@@ -425,14 +661,13 @@ function App() {
                 <div className="card">
                   <h2 className="post-title">Create a Post</h2>
                   <form onSubmit={handleCreatePostOrReply}>
-                    <textarea
-                      className="input-field"
-                      style={{ minHeight: '120px', resize: 'vertical' }}
-                      placeholder="What's on your mind?"
+                    <InputWithMentions
                       value={contentInput}
-                      onChange={e => setContentInput(e.target.value)}
+                      onChange={setContentInput}
                       onPaste={handlePaste}
-                      required
+                      placeholder="What's on your mind?"
+                      agents={agents}
+                      disabled={isOrchestrating}
                     />
                     {pendingAttachment && (
                       <div style={{ marginBottom: '12px', fontSize: '0.8rem', color: 'var(--reddit-blue)' }}>
@@ -454,7 +689,41 @@ function App() {
                   <div className="card">
                     <div className="post-meta">Posted by {post.author} • {new Date(post.createdAt).toLocaleTimeString()}</div>
                     <div className="post-content" style={{ fontSize: '1.2rem', fontWeight: 500 }}>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          text: ({ node, ...props }) => {
+                            const text = props.children?.toString() || '';
+                            const mentionRegex = /u\/([A-Za-z0-9_]+)/g;
+                            const parts = text.split(mentionRegex);
+
+                            return (
+                              <>
+                                {parts.map((part, index) => {
+                                  if (index % 2 === 1) {
+                                    return (
+                                      <span
+                                        key={index}
+                                        style={{
+                                          backgroundColor: 'var(--reddit-blue)',
+                                          color: 'white',
+                                          padding: '2px 4px',
+                                          borderRadius: '3px',
+                                          fontSize: '0.85em',
+                                          fontWeight: 'bold',
+                                        }}
+                                      >
+                                        u/{part}
+                                      </span>
+                                    );
+                                  }
+                                  return part;
+                                })}
+                              </>
+                            );
+                          },
+                        }}
+                      >
                         {post.content}
                       </ReactMarkdown>
                       {post.attachment && (
@@ -488,14 +757,13 @@ function App() {
                         Replying to {messages.find(m => m.id === replyTarget)?.author}
                       </div>
                       <form onSubmit={handleCreatePostOrReply}>
-                        <textarea
-                          className="input-field"
-                          autoFocus
-                          placeholder="Your reply..."
+                        <InputWithMentions
                           value={contentInput}
-                          onChange={e => setContentInput(e.target.value)}
+                          onChange={setContentInput}
                           onPaste={handlePaste}
-                          required
+                          placeholder="Your reply..."
+                          agents={agents}
+                          disabled={isOrchestrating}
                         />
                         {pendingAttachment && (
                           <div style={{ marginBottom: '12px', fontSize: '0.8rem', color: 'var(--reddit-blue)' }}>
