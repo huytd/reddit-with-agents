@@ -70,10 +70,21 @@ Markdown Style Constraint:
             ? "Since you are replying to an existing comment, keep your response brief and concise, like a short Reddit comment."
             : "Since you are the first to respond, provide a comprehensive but focused answer.";
 
-        return `You are participating in a Reddit-like thread as "${agent.name}". 
+        const webSearchCapability = `
+Web Search Capability:
+You have access to web search and URL reading tools. If you need to verify information, get current data, or research a topic:
+1. You can search the web using the format: [SEARCH: <your query>]
+2. You can read specific URLs using the format: [READ: <url>]
+3. For comprehensive research: [SEARCH_AND_READ: <query>]
+
+When you use these tools, the results will be automatically fetched and included in your context. You can then reference the search results in your response. Use web search judiciously - only when you need to verify facts, get current information, or provide well-sourced answers.`;
+
+        return `You are participating in a Reddit-like thread as "${agent.name}".
 Your persona: ${basePrompt}
 
 ${brevityPrompt}
+${webSearchCapability}
+
 ${styleConstraint}
 
 Do not use placeholders.`;
