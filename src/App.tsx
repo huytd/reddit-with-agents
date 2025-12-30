@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { APIConfig, Message, Post, Agent } from './types';
 import { DEFAULT_AGENTS, AgentManager, PERSONALITY_PROMPTS } from './logic/AgentManager';
 import { LLMService } from './services/LLMService';

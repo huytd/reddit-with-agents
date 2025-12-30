@@ -121,7 +121,7 @@ export class LLMService {
                     searchResults += content;
                     searchResults += '\n\n';
                 } else if (cmd.type === 'SEARCH_AND_READ') {
-                    const { content, searchResults: results } = await WebSearchService.searchAndRead(cmd.query);
+                    const { content } = await WebSearchService.searchAndRead(cmd.query);
                     searchResults += `Search and read query: "${cmd.query}"\n\n`;
                     searchResults += content;
                 }

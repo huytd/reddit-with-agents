@@ -64,7 +64,7 @@ export class WebSearchService {
 
             // Read content from top URLs (limited to avoid too many requests)
             const urlsToRead = searchResults.slice(0, maxUrlsToRead);
-            const contentPromises = urlsToRead.map((result, index) =>
+            const contentPromises = urlsToRead.map((result) =>
                 this.readUrl(result.url).catch(err => {
                     console.error(`Failed to read ${result.url}:`, err);
                     return `[Failed to read ${result.url}]`;
