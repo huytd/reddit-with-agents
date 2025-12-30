@@ -584,7 +584,7 @@ function App() {
                         className="input-field"
                         value={config.model}
                         onChange={e => setConfig({ ...config, model: e.target.value })}
-                        placeholder="gpt-3.5-turbo"
+                        placeholder="gpt-5.1-mini"
                         required
                       />
                     </div>

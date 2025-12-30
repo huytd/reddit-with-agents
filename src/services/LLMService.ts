@@ -26,7 +26,7 @@ export class LLMService {
                     'Authorization': `Bearer ${config.apiKey}`
                 },
                 body: JSON.stringify({
-                    model: modelOverride || config.model || 'gpt-3.5-turbo',
+                    model: modelOverride || config.model || 'gpt-5.1-mini',
                     messages: formattedMessages,
                     temperature: 0.7,
                 })
@@ -151,7 +151,7 @@ export class LLMService {
                 'Authorization': `Bearer ${config.apiKey}`
             },
             body: JSON.stringify({
-                model: modelOverride || config.model || 'gpt-3.5-turbo',
+                model: modelOverride || config.model || 'gpt-5.1-mini',
                 messages: [
                     { role: 'system', content: systemPrompt },
                     ...newMessages.map(m => {
